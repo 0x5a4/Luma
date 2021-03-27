@@ -8,8 +8,8 @@ ws2812.init()
     Array holding the different animations, aka specifying what to do in what mode
     1 -> static
     2 -> rainbow
-    3 -> lcycle
-    4 -> rcycle
+    3 -> positive_cycle
+    4 -> negative_rcycle
 --]]
 animations = dofile("loadanimations.lc")
 
@@ -80,7 +80,7 @@ end)
 
 --Register Wifi Event Monitors
 wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, function (T)
-    print("Successfully connected to "..T.SSID.." on channel "..T.channel);
+    print("Successfully connected to "..T.SSID.." on channel "..T.channel.."(RSSI: "..wifi.sta.getrssi()..")");
 end)
 
 wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
@@ -106,15 +106,39 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
             gpio.write(config.systemIndicationLedPin, gpio.HIGH)
         end
     end
-    ledtimer = nil
-    ledflag = nil
+    ledtimer, ledflag = nil, nil
+
+    --Setup MDNS Server
+    if mdns and config.net.device_name then --Check if included and enabled
+        local result, errmsg = pcall(function() mdns.register(config.net.device_name, {
+            port=config.net.udp_port,
+
+        })end)
+        if (not result) then
+            print("Failed to register mDNS")
+            print(errmsg)
+        else 
+            print("MDNS Setup completed. Now available as: "..config.net.device_name..".local")
+        end
+    end
+    
+    --Determine Global IP
+    if http and config.net.print_global_ip then
+        http.get("http://api.ipify.org/", nil, function(code, data)
+            if code == 200 then
+               print("Global IP is "..data)
+            else
+                print("Could not determine Global IP. Status code: "..code)
+            end
+        end)
+    end
+    
     collectgarbage("collect")
 end)
 
 --Configure Wifi
 wifi.setmode(wifi.STATION)
 wifi.sta.config(config.wifi)
-
---Startup Feedback
-print("Setup completed in "..((tmr.now() - setuptime) / 1000).."ms")
-setuptime = nil
+if config.net.device_name then
+    wifi.sta.sethostname("NODE-"..config.net.device_name)
+end

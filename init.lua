@@ -41,3 +41,7 @@ end
 
 --Preparation finished. Now do what we actually want to do
 dofile("setup.lc")
+
+--Startup Feedback
+print("Setup completed in "..((tmr.now() - setuptime) / 1000).."ms")
+setuptime = nil

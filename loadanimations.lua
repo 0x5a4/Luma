@@ -10,7 +10,7 @@ end
 return {
     function () --static
         print("I am static")
-        ws2812.write(ledstate.led:sub(1, config.ledNum * config.led.byteCount))
+        ws2812.write(ledstate.led:sub(1, config.led.ledNum * config.led.byteCount))
     end,
     function () --rainbow
         print("I hunt terrorist")
