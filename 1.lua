@@ -1,9 +1,8 @@
 -- Get Command
---TODO: Make Config 'gettable' but not 'settable'
 return function (args, data, sender)
     if args == 0 then
         --LED
-        socket:send(sender.port, sender.ip, #ledstate.led = 0 and string.char(0,0,0) or ledstate.led)
+        socket:send(sender.port, sender.ip, #ledstate.led == 0 and string.char(0,0,0) or ledstate.led)
     elseif args == 1 then
         --POWER
         socket:send(sender.port, sender.ip, tostring(ledstate.power))
@@ -13,5 +12,11 @@ return function (args, data, sender)
     elseif args == 3 then
         --Speed
         socket:send(sender.port, sender.ip, tostring(ledstate.speed))
+    elseif args == 128 then
+        --LED Number
+        socket:send(sender.port, sender.ip, tostring(config.led.ledNum))
+    elseif args == 129 then
+        --Led Byte Count
+        socket:send(sender.port, sender.ip, tostring(config.led.byteCount))
     end
 end

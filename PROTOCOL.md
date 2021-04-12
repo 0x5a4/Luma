@@ -79,13 +79,14 @@ Valuename | ID
 [power](#power) | 1 
 [mode](#mode) | 2
 [speed](#speed) | 3
+[lednum](#lednum) | 128
+[bytesPerLED](#bytesPerLED) | 129
 
 ### led
 LED Configuration. RGB or RGBW(depends on your strip) Pattern of any length
 
 ### power
 Whether the strip should be turned on. 0 is off, 1 is on. Sending 11111111 inverts the current one
-
 ### mode
 
 Mode | ID | description
@@ -98,6 +99,11 @@ negative_cycle | 3 | shift the whole led configuration in the negative direction
 ### speed
 Speed to play the current animation in miliseconds. Data is added up to one big number so theres no limit at 255(8-bit)
 
+### lednum
+The length of the LED strip. Set within the device config. This value is Immutable
+
+### bytesPerLED
+How many Bytes Per Color of the LED(3 for RGB/4 for RGBW). This value is Immutable
 
 
 

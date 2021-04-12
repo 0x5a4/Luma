@@ -112,13 +112,13 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
     if mdns and config.net.device_name then --Check if included and enabled
         local result, errmsg = pcall(function() mdns.register(config.net.device_name, {
             port=config.net.udp_port,
-
+            service="luma"
         })end)
         if (not result) then
             print("Failed to register mDNS")
             print(errmsg)
         else 
-            print("MDNS Setup completed. Now available as: "..config.net.device_name..".local")
+            print("MDNS Setup completed. Now available as: "..config.net.device_name..".local providing _luma._tcp")
         end
     end
     

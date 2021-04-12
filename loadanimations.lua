@@ -31,7 +31,7 @@ return {
         collectgarbage("collect")
         animationtimer:alarm(ledstate.speed, tmr.ALARM_AUTO, function ()
             buffer:shift(1, ws2812.SHIFT_CIRCULAR)
-            ws2812.write(buffer:sub(1, config.ledNum - 1))
+            ws2812.write(buffer:sub(1, config.led.ledNum - 1))
         end)
     end,
     function () --positive_cycle

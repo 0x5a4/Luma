@@ -1,5 +1,11 @@
 -- Set Command
+-- TODO: Broadcast changes
 return function(args, data)
+    if args >= 128 then
+        print("Cannot modify value "..tostring(args).."(immutable)")
+        return
+    end
+    
     if (args == 0) then
         -- LED
         ledstate.led = data
