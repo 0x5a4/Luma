@@ -126,6 +126,7 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
     if http and config.net.print_global_ip then
         http.get("http://api.ipify.org/", nil, function(code, data)
             if code == 200 then
+               global_ip = data
                print("Global IP is "..data)
             else
                 print("Could not determine Global IP. Status code: "..code)

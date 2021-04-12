@@ -18,5 +18,9 @@ return function (args, data, sender)
     elseif args == 129 then
         --Led Byte Count
         socket:send(sender.port, sender.ip, tostring(config.led.byteCount))
+    elseif args == 130 then
+        --Global IP Address
+        --Send the Global IP if global_ip isnt nil(It has been determined). Send "null" otherwise
+        socket:send(sender.port, sender.ip, tostring(global_ip and global_ip or "null"))
     end
 end

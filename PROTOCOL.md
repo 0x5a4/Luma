@@ -81,6 +81,7 @@ Valuename | ID
 [speed](#speed) | 3
 [lednum](#lednum) | 128
 [bytesPerLED](#bytesPerLED) | 129
+[globalIP](#globalIP) | 130
 
 ### led
 LED Configuration. RGB or RGBW(depends on your strip) Pattern of any length
@@ -100,10 +101,13 @@ negative_cycle | 3 | shift the whole led configuration in the negative direction
 Speed to play the current animation in miliseconds. Data is added up to one big number so theres no limit at 255(8-bit)
 
 ### lednum
-The length of the LED strip. Set within the device config. This value is Immutable
+The length of the LED strip. Set within the device config. This value is immutable
 
 ### bytesPerLED
-How many Bytes Per Color of the LED(3 for RGB/4 for RGBW). This value is Immutable
+How many Bytes Per Color of the LED(3 for RGB/4 for RGBW). This value is immutable
+
+### Global IP
+Returns the Global IP of the device. Only works if http is included in the firmware("null" otherwise). This value is immutable
 
 
 
