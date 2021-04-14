@@ -1,4 +1,4 @@
---General Timer for animations
+--General Timer for animations, required by all animations(except "static")
 animationtimer = animationtimer and animationtimer or tmr:create()
 
 --Create a new Buffer and fill it with the led configuration
@@ -29,7 +29,7 @@ return {
         end
         g, r, b, w = nil, nil, nil, nil
         collectgarbage("collect")
-        animationtimer:alarm(ledstate.speed, tmr.ALARM_AUTO, function ()
+        animationtimer:alarm(ledstate.speedMS, tmr.ALARM_AUTO, function ()
             buffer:shift(1, ws2812.SHIFT_CIRCULAR)
             ws2812.write(buffer:sub(1, config.led.ledNum - 1))
         end)
@@ -37,7 +37,7 @@ return {
     function () --positive_cycle
         print("I spin positive")
         createBuffer()
-        animationtimer:alarm(ledstate.speed, tmr.ALARM_AUTO, function ()
+        animationtimer:alarm(ledstate.speedMS, tmr.ALARM_AUTO, function ()
             buffer:shift(1, ws2812.SHIFT_CIRCULAR)
             ws2812.write(buffer)
         end)
@@ -45,7 +45,7 @@ return {
     function () --negative_cycle
         print("I spin negative")
         createBuffer()
-        animationtimer:alarm(ledstate.speed, tmr.ALARM_AUTO, function ()
+        animationtimer:alarm(ledstate.speedMS, tmr.ALARM_AUTO, function ()
             buffer:shift(-1, ws2812.SHIFT_CIRCULAR)
             ws2812.write(buffer)
         end)

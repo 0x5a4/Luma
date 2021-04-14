@@ -1,3 +1,4 @@
+--Used to track how long the setup took
 setuptime = tmr.now()
 --Load Config
 config = dofile("config.lua")
@@ -33,7 +34,7 @@ for k, v in pairs(file.list()) do
         if (flag) then
             uart.write(0, "Compiling "..k.."...")
             node.compile(k)
-            file.remove(k)
+            file.remove(k) --Delete original
             print("Done!")
         end
     end

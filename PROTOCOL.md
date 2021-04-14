@@ -98,7 +98,7 @@ positive_cycle | 2 | shift the whole led configuration in positive direction. 1 
 negative_cycle | 3 | shift the whole led configuration in the negative direction. 1 Pixel at a time, speed determined by [speed](#speed)
 
 ### speed
-Speed to play the current animation in miliseconds. Data is added up to one big number so theres no limit at 255(8-bit)
+Speed to play the current animation in miliseconds. 1 "Speed" corresponds to 500ms. Data is added up to allow for values biger than 255
 
 ### lednum
 The length of the LED strip. Set within the device config. This value is immutable

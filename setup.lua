@@ -19,11 +19,15 @@ ledstate = {}
 if file.exists("ledstate.lua") then
     ledstate = dofile("ledstate.lua")
 else
-    --Does not exist create default
+    --Does not exist, create default
     ledstate.power = false
     ledstate.led = ''
     ledstate.mode = 0
     ledstate.speed = 1000
+end
+--Translate the Speed value to milliseconds
+ledstate.speedMS = function()
+    return ledstate.speed * 500
 end
 
 local meta = {}
@@ -33,18 +37,18 @@ meta.__call = function (table, dontSave)
     print("\tled: "..ledstate.led)
     print("\tpower: "..tostring(ledstate.power))
     print("\tmode: "..tostring(ledstate.mode))
-    print("\tspeed: "..tostring(ledstate.speed).."ms")
+    print("\tspeed: "..tostring(ledstate.speed).."("..ledstate.speedMS.."ms)")
 
     --Apply
     if (table.power) then
         gpio.write(config.led.powerPin, gpio.HIGH)
-        animations[ledstate.mode + 1]() --plus 1 cause arrays start at 1 but indexes start at 0 to keep it consistent
+        animations[ledstate.mode + 1]() --plus 1 cause arrays start at 1 but our indexes start at 0 to keep it consistent
     else
         gpio.write(config.led.powerPin, gpio.LOW)
         animationtimer:stop() --LED is not powered anyway so we might as well stop the animationtimer
     end
 
-    --Save
+    --Invert dontSave so if the argument isnt given we still apply(nil is false)
     if (not dontSave) then
         local state_file = file.open("ledstate.lua", "w+")
         state_file:writeline("--GENERATED DO NOT MODIFY")
@@ -57,7 +61,7 @@ meta.__call = function (table, dontSave)
         state_file:close()
     end
 end
-setmetatable(ledstate, meta) --Set the Metatable so ledstate becomes callable and we can do ledstate() to save and apply.
+setmetatable(ledstate, meta) --Set the Metatable, so ledstate becomes callable and we can do ledstate() to save and apply.
 
 --Apply LED State, dont save
 ledstate(true)
@@ -68,11 +72,16 @@ socket:listen(config.net.udp_port);
 socket:on("receive", function(s, data, port, ip)
     print("Message received from "..ip.." on port "..port)
     local sender = {ip=ip, port=port}
-    local metabyte = string.byte(data)
-    local commandindex = bit.rshift(metabyte, 6);
+    local metabyte = string.byte(data) --First byte
+    local commandindex = bit.rshift(metabyte, 6); --First 2 bits of metabyte
     if file.exists(commandindex..".lc") then
         local args = bit.band(metabyte, 0x3F) --0x3F is 00111111 which, when used with a bitwise AND gives us only the last 6 bits(the ones we care about)
-        dofile(commandindex..".lc")(args, data:sub(2, -1), sender)
+        if dofile(commandindex..".lc")(args, data:sub(2, -1), sender) then
+            if config.net.notifyIP then
+                --Command returned true, notifyIP specified, indicating that we should repeat the command to notifyIP so they can react to the changes
+                socket:send(port, config.net.notifyIP, data)
+            end
+        end
     else
         print("Unrecognized command index "..commandindex)
     end
@@ -88,6 +97,7 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
     IPCONFIG = {}
     IPCONFIG.netmask = T.netmask
     IPCONFIG.gateway = T.gateway
+    --Override IP if requested
     if (config.net.ip_address ~= nil) then
         print("Overriding Ip with "..tostring(config.net.ip_address).." specified in config");
         IPCONFIG = {}
@@ -96,17 +106,6 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
     else
         IPCONFIG.ip = T.IP
     end
-
-    --Setup completed, stop led blink
-    if (ledtimer:state()) then
-        ledtimer:unregister()
-        if config.sysLedIdleMode then
-            gpio.write(config.systemIndicationLedPin, gpio.LOW)
-        else
-            gpio.write(config.systemIndicationLedPin, gpio.HIGH)
-        end
-    end
-    ledtimer, ledflag = nil, nil
 
     --Setup MDNS Server
     if mdns and config.net.device_name then --Check if included and enabled
@@ -133,13 +132,24 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
             end
         end)
     end
+
+    --Setup completed, stop led blink
+    if (ledtimer:state()) then
+        ledtimer:unregister()
+        if config.sysLedIdleMode then
+            gpio.write(config.systemIndicationLedPin, gpio.LOW)
+        else
+            gpio.write(config.systemIndicationLedPin, gpio.HIGH)
+        end
+    end
+    ledtimer, ledflag = nil, nil
     
     collectgarbage("collect")
 end)
 
 --Configure Wifi
-wifi.setmode(wifi.STATION)
-wifi.sta.config(config.wifi)
 if config.net.device_name then
     wifi.sta.sethostname("NODE-"..config.net.device_name)
 end
+wifi.setmode(wifi.STATION)
+wifi.sta.config(config.wifi)
