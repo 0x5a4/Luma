@@ -82,6 +82,7 @@ Valuename | ID
 [lednum](#lednum) | 128
 [bytesPerLED](#bytesPerLED) | 129
 [globalIP](#globalIP) | 130
+[dummy](#dummy) | 131
 
 ### led
 LED Configuration. RGB or RGBW(depends on your strip) Pattern of any length
@@ -109,5 +110,7 @@ How many Bytes Per Color of the LED(3 for RGB/4 for RGBW). This value is immutab
 ### Global IP
 Returns the Global IP of the device. Only works if http is included in the firmware("null" otherwise). This value is immutable
 
+## dummy
+Just a mock value to test if the device is reachable. Obviously immutable
 
 

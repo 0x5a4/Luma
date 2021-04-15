@@ -23,5 +23,8 @@ return function (args, data, sender)
         --Global IP Address
         --Send the Global IP if global_ip isnt nil(It has been determined). Send "null" otherwise
         socket:send(sender.port, sender.ip, tostring(global_ip and global_ip or "null"))
+    elseif args == 131 then
+        --Dummy
+        socket:send(sender.port, sender.ip, "dummy")
     end
 end
