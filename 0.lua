@@ -30,8 +30,7 @@ return function(args, data)
             speed = speed + string.byte(data, i)
         end
         --Cap at timer maximum(1:54:30)
-        --speed needs to to be multiplied with 500 to translate to milliseconds
-        ledstate.speed = speed * 500 <= 6870947 and speed or 6870947
+        ledstate.speed = speed <= 13741 and speed or 13741
     end
     ledstate() --Save and Apply
     return true --Indicate that we wish to notify config.net.notifyIP of the changes that were made
