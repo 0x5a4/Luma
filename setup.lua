@@ -23,7 +23,7 @@ else
     ledstate.power = false
     ledstate.led = ''
     ledstate.mode = 0
-    ledstate.speed = 1000
+    ledstate.speed = 2
 end
 --Translate the Speed value to milliseconds
 ledstate.speedMS = function()
@@ -79,7 +79,7 @@ socket:on("receive", function(s, data, port, ip)
         if dofile(commandindex..".lc")(args, data:sub(2, -1), sender) then
             if config.net.notifyIP then
                 --Command returned true, notifyIP specified, indicating that we should repeat the command to notifyIP so they can react to the changes
-                socket:send(port, config.net.notifyIP, data)
+                socket:send(config.net.udp_response_port, config.net.notifyIP, data)
             end
         end
     else
