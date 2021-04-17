@@ -37,7 +37,7 @@ meta.__call = function (table, dontSave)
     print("\tled: "..ledstate.led)
     print("\tpower: "..tostring(ledstate.power))
     print("\tmode: "..tostring(ledstate.mode))
-    print("\tspeed: "..tostring(ledstate.speed).."("..ledstate.speedMS.."ms)")
+    print("\tspeed: "..tostring(ledstate.speed).."("..ledstate.speedMS().."ms)")
 
     --Apply
     if (table.power) then
