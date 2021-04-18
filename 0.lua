@@ -27,7 +27,8 @@ return function(args, data)
         local speed = 0
         --Add each bit so numbers about 255 are possible
         for i = 1, #data do
-            speed = speed + string.byte(data, i)
+            speed = bit.lshift(speed, 8)
+            speed = bit.bor(speed, data:sub(i,i))
         end
         --Cap at timer maximum(1:54:30)
         ledstate.speed = speed <= 13741 and speed or 13741

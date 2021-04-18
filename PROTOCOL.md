@@ -83,6 +83,7 @@ Valuename | ID
 [bytesPerLED](#bytesPerLED) | 129
 [globalIP](#globalIP) | 130
 [dummy](#dummy) | 131
+[ledstate](#ledstate) | 132
 
 ### led
 LED Configuration. RGB or RGBW(depends on your strip) Pattern of any length
@@ -99,7 +100,8 @@ positive_cycle | 2 | shift the whole led configuration in positive direction. 1 
 negative_cycle | 3 | shift the whole led configuration in the negative direction. 1 Pixel at a time, speed determined by [speed](#speed)
 
 ### speed
-Speed to play the current animation in miliseconds. 1 "Speed" corresponds to 500ms. Data is added up to allow for values biger than 255
+Speed to play the current animation in miliseconds. 1 "Speed" corresponds to 500ms. Data is seen as one giant byte so if you give 2 bytes their seen as
+a 16-bit byte
 
 ### lednum
 The length of the LED strip. Set within the device config. This value is immutable
