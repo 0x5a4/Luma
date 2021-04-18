@@ -79,11 +79,11 @@ Valuename | ID
 [power](#power) | 1 
 [mode](#mode) | 2
 [speed](#speed) | 3
-[lednum](#lednum) | 128
-[bytesPerLED](#bytesPerLED) | 129
-[globalIP](#globalIP) | 130
-[dummy](#dummy) | 131
-[ledstate](#ledstate) | 132
+[lednum](#lednum) | 40
+[bytesPerLED](#bytesPerLED) | 41
+[globalIP](#globalIP) | 42
+[dummy](#dummy) | 43
+[ledstate](#ledstate) | 39
 
 ### led
 LED Configuration. RGB or RGBW(depends on your strip) Pattern of any length
@@ -101,7 +101,7 @@ negative_cycle | 3 | shift the whole led configuration in the negative direction
 
 ### speed
 Speed to play the current animation in miliseconds. 1 "Speed" corresponds to 500ms. Data is seen as one giant byte so if you give 2 bytes their seen as
-a 16-bit byte
+a 16-bit byte. Max is 13741 so 2 bytes should be enough
 
 ### lednum
 The length of the LED strip. Set within the device config. This value is immutable
@@ -114,5 +114,13 @@ Returns the Global IP of the device. Only works if http is included in the firmw
 
 ## dummy
 Just a mock value to test if the device is reachable. Obviously immutable
+
+## ledstate
+The entire led configuration at once using the following format:
+
+```
+00000000 00000000 00000000 00000000 00000000 . . .
+<power > <mode  > <speed          > <led         >
+```
 
 
