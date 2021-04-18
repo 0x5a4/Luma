@@ -10,6 +10,7 @@ setValue = function(index, value)
     if (index == 0) then
         -- LED
         ledstate.led = value
+        print("Setting LED to "..ledstate.led)
     elseif index == 1 then
         -- Power
         local firstbyte = string.byte(value)
@@ -20,9 +21,11 @@ setValue = function(index, value)
         elseif firstbyte == 0xFF then
             ledstate.power = not ledstate.power
         end
+        print("Setting power to "..ledstate.power)
     elseif index == 2 then
         --Mode
         ledstate.mode = string.byte(value)
+        print("Setting mode to "..ledstate.mode)
     elseif index == 3 then
         --Speed
         local speed = 0
@@ -33,6 +36,7 @@ setValue = function(index, value)
         end
         --Cap at timer maximum(1:54:30)
         ledstate.speed = speed <= 13741 and speed or 13741
+        print("Setting speed to "..ledstate.speed)
     elseif index == 39 then
         --Ledstate
         setValue(1, value:sub(1,1))
