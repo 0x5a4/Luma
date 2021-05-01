@@ -4,6 +4,92 @@ gpio.mode(config.led.powerPin, gpio.OUTPUT)
 --Init ws2812 module
 ws2812.init()
 
+--Math
+
+--The absoluter value of num
+mathabs = function (num)
+    if num < 0 then
+        return num * -1
+    else
+        return num
+    end
+end
+
+mathmin = function (num1, num2)
+    if num1 < num2 then
+        return num1
+    else
+        return num2
+    end
+end
+
+--HSV Conversion Methods
+
+--Extract Hue, Saturation and Value from a 3 byte chain
+extract_hsv = function (source)
+    assert(#source == 3, "HSV Extraction Target length needs to be exactly 3")
+    local firstbyte = source:sub(1)
+    local secondbyte = source:sub(2)
+    local thirdbyte = source:sub(3)
+    local hue = (firstbyte << 1) | (secondbyte & 0x80) --First 9 bytes
+    local saturation = secondbyte & 0x7F --next 7
+    local value = thirdbyte & 0xFE --next 7
+    return hue, saturation, value
+end
+
+--Convert HSV to RGB or RGBW depending on config.led.byteCount and return as String
+convertToLedString = function (hue, saturation, value)
+    if config.led.byteCount == 3 then
+        local g, r, b = hsv2rgb(hue, saturation, value)
+        return string.char(r,g,b)
+    else
+        local g, r, b, w = hsv2rgbw(hue, saturation, value)
+        return string.char(r,g,b,w)
+    end
+end
+
+hsv2rgb = function (hue, saturation, value)
+    assert(hue <= 360 and hue >= 0, "Hue must be in range 0-360(was "..hue..")")
+    assert(saturation <= 100 and value >= 0, "Saturation must be in range 0-100(was "..saturation..")")
+    assert(value <= 100 and value >= 0, "Value must be in range 0-100(was "..value..")")
+
+    local s = saturation / 100
+    local v = value / 100
+    local chroma = v * s
+    local h = hue / 60
+    local x = chroma * (1 - mathabs(h % 2 - 1))
+    local r,g,b = 0,0,0
+    if h <= 1 then
+        r,g,b = chroma, x, 0
+    elseif h <= 2 then
+        r,g,b = x, chroma, 0
+    elseif h <= 3 then
+        r,g,b = 0, chroma, x
+    elseif h <= 4 then
+        r,g,b = 0, x, chroma
+    elseif h <= 5 then
+        r,g,b = x, 0, chroma
+    elseif h <= 6 then
+        r,g,b = chroma, 0, x
+    else
+        r,g,b = 0,0,0
+    end
+    local m = v - chroma
+    r = (r + m) * 255
+    g = (g + m) * 255
+    b = (b + m) * 255
+    return r // 1, g // 1, b // 1
+end
+
+hsv2rgbw = function (hue, saturation, value)
+    local r, g, b = hsv2rgb(hue, saturation, value)
+    local w = mathmin(r, mathmin(g, b))
+    r = r - w
+    g = g - w
+    b = b - w
+    return r, g, b, w
+end
+
 --[[
     Array holding the different animations, aka specifying what to do in what mode
     1 -> static
@@ -22,6 +108,7 @@ else
     --Does not exist, create default
     ledstate.power = false
     ledstate.led = ''
+    ledstate.ledhsv = ''
     ledstate.mode = 0
     ledstate.speed = 2
 end
@@ -54,7 +141,8 @@ meta.__call = function (table, dontSave)
         state_file:writeline("--GENERATED DO NOT MODIFY")
         state_file:writeline("local s={}")
         state_file:writeline("s.power="..tostring(table.power))
-        state_file:writeline("s.led='"..tostring(table.led).."'")
+        state_file:writeline("s.led='"..table.led.."'")
+        state_file:writeline("s.ledhsv='"..table.ledhsv.."'")
         state_file:writeline("s.mode="..tostring(table.mode).."")
         state_file:writeline("s.speed="..tostring(table.speed))
         state_file:writeline("return s")
@@ -73,9 +161,9 @@ socket:on("receive", function(s, data, port, ip)
     print("Message received from "..ip.." on port "..port)
     local sender = {ip=ip, port=port}
     local metabyte = string.byte(data) --First byte
-    local commandindex = bit.rshift(metabyte, 6); --First 2 bits of metabyte
+    local commandindex = metabyte >> 6; --First 2 bits of metabyte
     if file.exists(commandindex..".lc") then
-        local args = bit.band(metabyte, 0x3F) --0x3F is 00111111 which, when used with a bitwise AND gives us only the last 6 bits(the ones we care about)
+        local args = metabyte & 0x3F --0x3F is 00111111 which, when used with a bitwise AND gives us only the last 6 bits(the ones we care about)
         if dofile(commandindex..".lc")(args, data:sub(2, -1), sender) then
             if config.net.notifyIP then
                 --Command returned true, notifyIP specified, indicating that we should repeat the command to notifyIP so they can react to the changes

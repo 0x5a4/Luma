@@ -34,17 +34,6 @@ What does the Program see?
 * First byte of the data is ```00000001``` -> true
 * Set the Power value to true 
 
-```
-Message: 00000000 00000000 00000000 11111111
-            <meta>   Red    Green     Blue
-```
-
-What does the Program see?
-* First 2 bits: ```00``` -> Command ID 0 -> Set Command
-* Remaining 6 bits(args): ```000000``` -> Value ID 0 -> Led
-* Set Led to ```00000000 00000000 11111111```
-* 0 Green 0 Red 0 Blue -> First Led blue
-
 ### Get Command
 Get a Value's data. The command arguments determine the [Value ID](#values)
 Answers on the same port as the message was received
@@ -79,19 +68,22 @@ Valuename | ID
 [power](#power) | 1 
 [mode](#mode) | 2
 [speed](#speed) | 3
+[ledstate](#ledstate) | 39
 [lednum](#lednum) | 40
-[bytesPerLED](#bytesPerLED) | 41
 [globalIP](#globalIP) | 42
 [dummy](#dummy) | 43
-[ledstate](#ledstate) | 39
 
 ### led
-LED Configuration. RGB or RGBW(depends on your strip) Pattern of any length
+Led Configuration. Transfered as HSV in 3 bytes. Converted locally acording to the byteCount.
+This is done to decrease the message length for and provide a more universal interface.
+It consists of segments made from 3 bytes representing the color of one LED. 
+The first 9 bits of the segment represent the colors hue(0-360), the next 7 the saturation(0-100), the next 7 the value(0-100)
+And yes theres one bit remaining, but we dont need it so it is ignored.
 
 ### power
 Whether the strip should be turned on. 0 is off, 1 is on. Sending 11111111 inverts the current one
-### mode
 
+### mode
 Mode | ID | description
 -----|----|------------
 static | 0 | No animation
@@ -105,9 +97,6 @@ a 16-bit byte. Max is 13741 so 2 bytes should be enough
 
 ### lednum
 The length of the LED strip. Set within the device config. This value is immutable
-
-### bytesPerLED
-How many Bytes Per Color of the LED(3 for RGB/4 for RGBW). This value is immutable
 
 ### Global IP
 Returns the Global IP of the device. Only works if http is included in the firmware("null" otherwise). This value is immutable
