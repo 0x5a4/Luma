@@ -32,7 +32,7 @@ return function (args, data, sender)
         msg = msg + string.char(ledstate.power and 1 or 0) --Power
         msg = msg + string.char(ledstate.mode) --Mode
         msg = msg + string.char(ledstate.speed & 0x1100) --Speed 1. byte
-        msg = msg + string.char(ledstate.speed & 0x0011)) --Speed 2. byte
+        msg = msg + string.char(ledstate.speed & 0x0011) --Speed 2. byte
         msg = msg + #ledstate.led > 0 and ledstate.led or string.char(0) --LED
         socket:send(config.net.udp_response_port, sender.ip, msg)
     end
