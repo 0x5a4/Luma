@@ -103,6 +103,7 @@ meta.__call = function (table, dontSave)
     --Print what the ledstate is
     print("LED State:")
     print("\tled: "..ledstate.led)
+    print("\tledhsv: "..ledstate.ledhsv)
     print("\tpower: "..tostring(ledstate.power))
     print("\tmode: "..tostring(ledstate.mode))
     print("\tspeed: "..tostring(ledstate.speed).."("..ledstate.speedMS().."ms)")
@@ -145,11 +146,17 @@ socket:on("receive", function(s, data, port, ip)
     local commandindex = bit.rshift(metabyte, 6); --First 2 bits of metabyte
     if file.exists(commandindex..".lc") then
         local args = bit.band(metabyte, 0x3F) --0x3F is 00111111 which, when used with a bitwise AND gives us only the last 6 bits(the ones we care about)
-        if dofile(commandindex..".lc")(args, data:sub(2, -1), sender) then
-            if config.net.notifyIP then
-                --Command returned true, notifyIP specified, indicating that we should repeat the command to notifyIP so they can react to the changes
-                socket:send(config.net.udp_response_port, config.net.notifyIP, data)
+        local status, returnval = pcall(dofile(commandindex..".lc"), args, data:sub(2, -1))
+        if status then
+            if returnval then
+                if config.net.notifyIP then
+                    --Command returned true, notifyIP specified, indicating that we should repeat the command to notifyIP so they can react to the changes
+                    socket:send(config.net.udp_response_port, config.net.notifyIP, data)
+                end
             end
+        else
+            print("Error executing command #"..commandindex..":")
+            print(returnval)
         end
     else
         print("Unrecognized command index "..commandindex)
@@ -218,7 +225,11 @@ end)
 
 --Configure Wifi
 if config.net.device_name then
-    wifi.sta.sethostname("NODE-"..config.net.device_name)
+    local status, err = pcall(wifi.sta.sethostname("NODE-"..config.net.device_name))
+    if status then
+        print("Cannot set Hostname:")
+        print(err)
+    end
 end
 wifi.setmode(wifi.STATION)
 print("Attempting Connection to "..config.wifi.ssid)

@@ -25,7 +25,7 @@ return function (args, data, sender)
         socket:send(config.net.udp_response_port, sender.ip, tostring(global_ip and global_ip or "null"))
     elseif args == 43 then
         --Dummy
-        socket:send(config.net.udp_response_port, sender.ip, "dummy")
+        socket:send(config.net.udp_response_port, sender.ip, string.char(0xFF))
     elseif args == 39 then
         --Ledstate
         msg = ""
