@@ -27,7 +27,7 @@ To use this project you'll need:
 3. Upload everything then restart the device([How?](#upload-program))
 
 ## Firmware
-**Required Modules**: node, net, file, gpio, ws2812, tmr, wifi   
+**Required Modules**: node, net, file, gpio, ws2812, bit, tmr, wifi   
 **Optional Modules**: http, mdns
 
 **Where to build?**   
