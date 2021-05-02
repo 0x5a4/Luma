@@ -7,7 +7,7 @@ setValue = function(index, value)
     
     if (index == 0) then
         -- LED
-        if value % 3 == 0 then
+        if #value % 3 == 0 then
             local ledval = ""
             for i = 1, #value, 3 do
                 local h,s,v = extract_hsv(value:sub(i, i+2))
@@ -38,8 +38,8 @@ setValue = function(index, value)
         local speed = 0
         --Add each bit so numbers about 255 are possible
         for i = 1, #value do
-            speed = speed << 8
-            speed = speed | value:sub(i,i)
+            speed = bit.lshift(speed, 8)
+            speed = bit.bor(speed, value:sub(i,i))
         end
         --Cap at timer maximum(1:54:30)
         ledstate.speed = speed <= 13741 and speed or 13741

@@ -4,46 +4,27 @@ gpio.mode(config.led.powerPin, gpio.OUTPUT)
 --Init ws2812 module
 ws2812.init()
 
---Math
-
---The absoluter value of num
-mathabs = function (num)
-    if num < 0 then
-        return num * -1
-    else
-        return num
-    end
-end
-
-mathmin = function (num1, num2)
-    if num1 < num2 then
-        return num1
-    else
-        return num2
-    end
-end
-
 --HSV Conversion Methods
 
 --Extract Hue, Saturation and Value from a 3 byte chain
 extract_hsv = function (source)
     assert(#source == 3, "HSV Extraction Target length needs to be exactly 3")
-    local firstbyte = source:sub(1)
-    local secondbyte = source:sub(2)
-    local thirdbyte = source:sub(3)
-    local hue = (firstbyte << 1) | (secondbyte & 0x80) --First 9 bytes
-    local saturation = secondbyte & 0x7F --next 7
-    local value = thirdbyte & 0xFE --next 7
+    local firstbyte = string.byte(source:sub(1))
+    local secondbyte = string.byte(source:sub(2))
+    local thirdbyte = string.byte(source:sub(3))
+    local hue = bit.bor(bit.lshift(firstbyte, 1), bit.band(secondbyte, 0x80)) --First 9 bytes
+    local saturation = bit.band(secondbyte, 0x7F) --next 7
+    local value = bit.rshift(bit.band(thirdbyte, 0xFE), 1) --next 7
     return hue, saturation, value
 end
 
 --Convert HSV to RGB or RGBW depending on config.led.byteCount and return as String
 convertToLedString = function (hue, saturation, value)
     if config.led.byteCount == 3 then
-        local g, r, b = hsv2rgb(hue, saturation, value)
+        local r, g, b = hsv2rgb(hue, saturation, value)
         return string.char(r,g,b)
     else
-        local g, r, b, w = hsv2rgbw(hue, saturation, value)
+        local r, g, b, w = hsv2rgbw(hue, saturation, value)
         return string.char(r,g,b,w)
     end
 end
@@ -57,7 +38,7 @@ hsv2rgb = function (hue, saturation, value)
     local v = value / 100
     local chroma = v * s
     local h = hue / 60
-    local x = chroma * (1 - mathabs(h % 2 - 1))
+    local x = chroma * (1 - math.abs(h % 2 - 1))
     local r,g,b = 0,0,0
     if h <= 1 then
         r,g,b = chroma, x, 0
@@ -78,12 +59,12 @@ hsv2rgb = function (hue, saturation, value)
     r = (r + m) * 255
     g = (g + m) * 255
     b = (b + m) * 255
-    return r // 1, g // 1, b // 1
+    return math.floor(r), math.floor(g), math.floor(b)
 end
 
 hsv2rgbw = function (hue, saturation, value)
     local r, g, b = hsv2rgb(hue, saturation, value)
-    local w = mathmin(r, mathmin(g, b))
+    local w = math.min(r, math.min(g, b))
     r = r - w
     g = g - w
     b = b - w
@@ -161,9 +142,9 @@ socket:on("receive", function(s, data, port, ip)
     print("Message received from "..ip.." on port "..port)
     local sender = {ip=ip, port=port}
     local metabyte = string.byte(data) --First byte
-    local commandindex = metabyte >> 6; --First 2 bits of metabyte
+    local commandindex = bit.rshift(metabyte, 6); --First 2 bits of metabyte
     if file.exists(commandindex..".lc") then
-        local args = metabyte & 0x3F --0x3F is 00111111 which, when used with a bitwise AND gives us only the last 6 bits(the ones we care about)
+        local args = bit.band(metabyte, 0x3F) --0x3F is 00111111 which, when used with a bitwise AND gives us only the last 6 bits(the ones we care about)
         if dofile(commandindex..".lc")(args, data:sub(2, -1), sender) then
             if config.net.notifyIP then
                 --Command returned true, notifyIP specified, indicating that we should repeat the command to notifyIP so they can react to the changes
@@ -240,4 +221,5 @@ if config.net.device_name then
     wifi.sta.sethostname("NODE-"..config.net.device_name)
 end
 wifi.setmode(wifi.STATION)
+print("Attempting Connection to "..config.wifi.ssid)
 wifi.sta.config(config.wifi)
