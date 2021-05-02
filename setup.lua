@@ -1,5 +1,7 @@
 --configure GPIO
-gpio.mode(config.led.powerPin, gpio.OUTPUT)
+if config.led.powerPin then
+    gpio.mode(config.led.powerPin, gpio.OUTPUT)
+end
 
 --Init ws2812 module
 ws2812.init()
@@ -110,10 +112,14 @@ meta.__call = function (table, dontSave)
 
     --Apply
     if (table.power) then
-        gpio.write(config.led.powerPin, gpio.HIGH)
+        if config.led.powerPin then
+            gpio.write(config.led.powerPin, gpio.HIGH)
+        end
         animations[ledstate.mode + 1]() --plus 1 cause arrays start at 1 but our indexes start at 0 to keep it consistent
     else
-        gpio.write(config.led.powerPin, gpio.LOW)
+        if config.led.powerPin then
+            gpio.write(config.led.powerPin, gpio.LOW)
+        end
         animationtimer:stop() --LED is not powered anyway so we might as well stop the animationtimer
     end
 
