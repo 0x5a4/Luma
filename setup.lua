@@ -150,9 +150,10 @@ socket:on("receive", function(s, data, port, ip)
     local sender = {ip=ip, port=port}
     local metabyte = string.byte(data) --First byte
     local commandindex = bit.rshift(metabyte, 6); --First 2 bits of metabyte
+    local cmdexectime = tmr.now()
     if file.exists(commandindex..".lc") then
         local args = bit.band(metabyte, 0x3F) --0x3F is 00111111 which, when used with a bitwise AND gives us only the last 6 bits(the ones we care about)
-        local status, returnval = pcall(dofile(commandindex..".lc"), args, data:sub(2, -1))
+        local status, returnval = pcall(dofile(commandindex..".lc"), args, data:sub(2, -1), sender)
         if status then
             if returnval then
                 if config.net.notifyIP then
@@ -167,6 +168,7 @@ socket:on("receive", function(s, data, port, ip)
     else
         print("Unrecognized command index "..commandindex)
     end
+    print("Command Execution took "..((tmr.now() - cmdexectime) / 1000).."ms")
 end)
 
 --Register Wifi Event Monitors
