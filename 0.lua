@@ -1,4 +1,5 @@
 -- Set Command
+ledconvtmr = ledconvtmr and ledconvtmr or tmr.create()
 setValue = function(index, value)
     if index >= 40 then
         print("Cannot modify value "..tostring(index).."(immutable)")
@@ -7,17 +8,20 @@ setValue = function(index, value)
     
     if (index == 0) then
         -- LED
-        if #value % 3 == 0 then
-            local ledval = ""
-            for i = 1, #value, 3 do
-                local h,s,v = extract_hsv(value:sub(i, i+2))
-                ledval = ledval..convertToLedString(h,s,v)
+        assert(#value % 3 == 0, "Cannot set LED Value. Data Length is not a multiple of 3")
+        local i = 1
+        local ledval = ""
+        ledconvtmr:alarm(5, tmr.ALARM_AUTO, function ()
+            if i < #value then
+                local h, s, v = extract_hsv(value:sub(i, i+2))
+                ledval = ledval..convertToLedString(h, s, v)
+                i = i + 3
+            else
+                ledstate.led = ledval
+                ledstate.ledhsv = value
+                ledconvtmr:stop()
             end
-            ledstate.led = ledval
-            ledstate.ledhsv = value
-        else
-            print("Cannot set LED Value. Data Length is not a multiple of 3")
-        end
+        end)
     elseif index == 1 then
         -- Power
         local firstbyte = string.byte(value)
