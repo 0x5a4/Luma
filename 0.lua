@@ -49,11 +49,11 @@ setValue = function(index, value)
         ledstate.speed = speed <= 13741 and speed or 13741
         print("Setting speed to "..ledstate.speed)
     elseif index == 39 then
-        --Ledstate
-        setValue(1, value:sub(1,1))
-        setValue(2, value:sub(2,2))
-        setValue(3, value:sub(3, 4))
-        setValue(0, value:sub(5, -1))
+        --state, ignore lednum
+        setValue(1, value:sub(2,2))
+        setValue(2, value:sub(3,3))
+        setValue(3, value:sub(4, 5))
+        setValue(0, value:sub(6, -1))
     end
 end
 

@@ -68,7 +68,7 @@ Valuename | ID
 [power](#power) | 1 
 [mode](#mode) | 2
 [speed](#speed) | 3
-[ledstate](#ledstate) | 39
+[state](#state) | 39
 [lednum](#lednum) | 40
 [globalIP](#globalIP) | 42
 [dummy](#dummy) | 43
@@ -104,12 +104,13 @@ Returns the Global IP of the device. Only works if http is included in the firmw
 ## dummy
 Just a mock value to test if the device is reachable. Obviously immutable
 
-## ledstate
-The entire led configuration at once using the following format:
+## state
+The entire configuration at once using the following format:
 
 ```
-00000000 00000000 00000000 00000000 00000000 . . .
-<power > <mode  > <speed          > <led         >
+00000000 00000000 00000000 00000000 00000000 00000000 . . .
+<lednum> <power > <mode  > <speed          > <led         >
 ```
+lednum is simply ignored when receiving
 
 

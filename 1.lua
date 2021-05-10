@@ -34,6 +34,7 @@ return function (args, data, sender)
     elseif args == 39 then
         --Ledstate
         local ledmsg = ""
+        ledmsg = ledmsg + string.char(ledstate.ledNum) -- Led Count
         ledmsg = ledmsg + string.char(ledstate.power and 1 or 0) --Power
         ledmsg = ledmsg + string.char(ledstate.mode) --Mode
         ledmsg = ledmsg + string.char(bit.band(ledstate.speed,0x1100)) --Speed 1. byte
