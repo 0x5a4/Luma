@@ -34,12 +34,12 @@ return function (args, data, sender)
     elseif args == 39 then
         --Ledstate
         local ledmsg = ""
-        ledmsg = ledmsg + string.char(ledstate.ledNum) -- Led Count
-        ledmsg = ledmsg + string.char(ledstate.power and 1 or 0) --Power
-        ledmsg = ledmsg + string.char(ledstate.mode) --Mode
-        ledmsg = ledmsg + string.char(bit.band(ledstate.speed,0x1100)) --Speed 1. byte
-        ledmsg = ledmsg + string.char(bit.band(ledstate.speed, 0x0011)) --Speed 2. byte
-        ledmsg = ledmsg + #ledstate.led > 0 and ledstate.led or string.char(0) --LED
+        ledmsg = ledmsg..string.char(ledstate.ledNum) -- Led Count
+        ledmsg = ledmsg..string.char(ledstate.power and 1 or 0) --Power
+        ledmsg = ledmsg..string.char(ledstate.mode) --Mode
+        ledmsg = ledmsg..string.char(bit.band(ledstate.speed,0x1100)) --Speed 1. byte
+        ledmsg = ledmsg..string.char(bit.band(ledstate.speed, 0x0011)) --Speed 2. byte
+        ledmsg = ledmsg..#ledstate.led > 0 and ledstate.led or string.char(0) --LED
         socket:send(config.net.udp_response_port, sender.ip, constructmsg(ledmsg))
     end
     print("Successfully send reply to "..sender.ip)
