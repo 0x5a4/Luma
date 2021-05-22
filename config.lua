@@ -7,6 +7,7 @@ config.net = {}
 config.compileExceptions = {"init.lua", "config.lua", "ledstate.lua"}
 config.systemIndicationLedPin = 0 --LED showing that the device is turned on, connecting to wifi (NodeMCU LED = 0). Can be any Pin basically
 config.sysLedIdleMode = false --Set to true to have the Led turned on when idle
+config.deviceid = 0 --Change this if you plan on using multiple devices. Should also be unique across multiple netorks
 
 --Wifi Config. Used to allow for control via UDP
 config.wifi.pwd = "Password123"

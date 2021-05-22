@@ -32,7 +32,7 @@ setValue = function(index, value)
         elseif firstbyte == 0xFF then
             ledstate.power = not ledstate.power
         end
-        print("Setting power to "..ledstate.power)
+        print("Setting power to "..tostring(ledstate.power))
     elseif index == 2 then
         --Mode
         ledstate.mode = string.byte(value)

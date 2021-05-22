@@ -1,9 +1,9 @@
 -- Get Command
 return function (args, data, sender)
     local constructmsg = function (d)
-        --It would be necessary to append the command id at the beginning but since its 0 it doesnt make a difference in the 
-        --numerical value. So we might aswell not do it
-        return string.char(args)..d
+        local response = string.char(bit.bor(0x80, args))
+        response = response..string.char(config.deviceid)..d
+        return response
     end
 
     if args == 0 then

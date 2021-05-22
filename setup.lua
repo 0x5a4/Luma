@@ -115,7 +115,7 @@ meta.__call = function (table, dontSave)
         if config.led.powerPin then
             gpio.write(config.led.powerPin, gpio.HIGH)
         end
-        animations[ledstate.mode + 1]() --plus 1 cause arrays start at 1 but our indexes start at 0 to keep it consistent
+        animations[ledstate.mode + 1]() --plus 1 because arrays start at 1 but our indexes start at 0 to keep it consistent
     else
         if config.led.powerPin then
             gpio.write(config.led.powerPin, gpio.LOW)
@@ -158,7 +158,9 @@ socket:on("receive", function(s, data, port, ip)
             if returnval then
                 if config.net.notifyIP then
                     --Command returned true, notifyIP specified, indicating that we should repeat the command to notifyIP so they can react to the changes
-                    socket:send(config.net.udp_response_port, config.net.notifyIP, data)
+                    local response = string.char(bit.bor(0x8, args)) --Command ID 2, append args
+                    response = response..string.char(config.deviceid)..data:sub(2, -1)
+                    socket:send(config.net.udp_response_port, config.net.notifyIP, response)
                 end
             end
         else
@@ -226,7 +228,9 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
             gpio.write(config.systemIndicationLedPin, gpio.HIGH)
         end
     end
+    print("Setup completed in "..((tmr.now() - setuptime) / 1000).."ms")
     ledtimer, ledflag = nil, nil
+    setuptime = nil
     
     collectgarbage("collect")
 end)
@@ -240,5 +244,6 @@ if config.net.device_name then
     end
 end
 wifi.setmode(wifi.STATION)
+print("Device ID is "..config.deviceid)
 print("Attempting Connection to "..config.wifi.ssid)
 wifi.sta.config(config.wifi)
