@@ -1,6 +1,6 @@
 ## Whats this?
-This project aims to create an easily expandable interface for controlling a ws2812 LED strip. Another goal was to make it not just accessible from a websocket
-but from any device that can send UDP Messages.
+This project aims to create an easily expandable interface for controlling a ws2812 LED strip. Each device is uniquely identified by a combination of 
+its IP-Address and a numeric ID to allow for multiple devices across different networks to still be distinguishable.  
 
 ## Motivation
 I actually wrote an early version of this in the first Lockdown, but my lack of knowledge about Lua and electronics brought this project to a quick end.
@@ -31,7 +31,7 @@ To use this project you'll need:
 **Optional Modules**: http, mdns
 
 **Where to build?**   
-You can either use [NodeMCU Cloud build service](https://nodemcu-build.com/), my attached firmware, or [build yourself](https://nodemcu.readthedocs.io/en/release/build/#docker-image). 
+You can either use [NodeMCU Cloud build service](https://nodemcu-build.com/), my attached firmware, or [build yourself](https://nodemcu.readthedocs.io/en/release/build/#docker-image).
 
 **How to flash?**   
 On Windows you can flash using [NodeMCU pyflasher](https://github.com/marcelstoer/nodemcu-pyflasher/releases).
