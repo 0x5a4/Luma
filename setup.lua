@@ -6,7 +6,7 @@ end
 --Init ws2812 module
 ws2812.init()
 
---HSV Conversion Methods
+--HSV Conversion Methods+
 
 --Extract Hue, Saturation and Value from a 3 byte chain
 extract_hsv = function (source)
@@ -173,6 +173,13 @@ socket:on("receive", function(s, data, port, ip)
     print("Command Execution took "..((tmr.now() - cmdexectime) / 1000).."ms")
 end)
 
+--Check if devicename is valid
+if not #config.net.device_name > 0 then
+    print("Invalid device_name "..config.net.device_name)
+    print("Needs to be longer than 0.")
+    config.net.device_name = nil
+end
+
 --Register Wifi Event Monitors
 wifi.eventmon.register(wifi.eventmon.STA_CONNECTED, function (T)
     print("Successfully connected to "..T.SSID.." on channel "..T.channel.."(RSSI: "..wifi.sta.getrssi()..")");
@@ -199,6 +206,7 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
             port=config.net.udp_port,
             service="luma"
         })end)
+
         if (not result) then
             print("Failed to register mDNS")
             print(errmsg)
