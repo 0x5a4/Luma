@@ -161,7 +161,7 @@ socket:on("receive", function(s, data, port, ip)
                     local response = string.char(bit.bor(0x8, args)) --Command ID 2, append args
                     response = response..string.char(config.deviceid)..data:sub(2, -1)
                     socket:send(config.net.udp_response_port, config.net.notifyIP, response)
-                end
+               end
             end
         else
             print("Error executing command #"..commandindex..":")
@@ -195,7 +195,7 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
 
     --Setup MDNS Server
     if mdns and config.net.device_name then --Check if included and enabled
-        local result, errmsg = pcall(function() mdns.register(config.net.device_name, {
+        local result, errmsg = pcall(function() mdns.register(config.net.device_name.."."..config.deviceid, {
             port=config.net.udp_port,
             service="luma"
         })end)
@@ -203,7 +203,7 @@ wifi.eventmon.register(wifi.eventmon.STA_GOT_IP, function (T)
             print("Failed to register mDNS")
             print(errmsg)
         else 
-            print("MDNS Setup completed. Now available as: "..config.net.device_name..".local providing _luma._tcp")
+            print("MDNS Setup completed. Now available as: "..config.net.device_name.."."..config.deviceid..".local providing _luma._tcp")
         end
     end
     
