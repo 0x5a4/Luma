@@ -1,3 +1,6 @@
+# Disclaimer
+Please dont use this. I really didn't know what i was doing, didnt test it and abandonded it.  
+
 ## Whats this?
 This project aims to create an easily expandable interface for controlling a ws2812 LED strip. Each device is uniquely identified by a combination of 
 its IP-Address and a numeric ID to allow for multiple devices across different networks to still be distinguishable.  
